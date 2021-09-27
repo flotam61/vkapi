@@ -4,29 +4,33 @@ import json
 import yadisk
 from tqdm import tqdm
 
+# 76119731
 
 with open("token.txt", "r") as file_object:
     token = file_object.read().strip()
 
-with open("yadisktoken.txt", "r") as myfile_object:
-    yatoken = myfile_object.read().strip()
+yatoken = input("Введите токен Яндекс диска, куда хотите загрузить фотографии ")
+idvk = input("Введите id страницы в вконтакте ")
 
 url = "https://api.vk.com/method/photos.get"
-params = {"owner_id": "76119731", "album_id": "profile", "photo_sizes": 1, "extended": 1, "access_token": token, "v": "5.131"}
+params = {"owner_id": idvk, "album_id": "profile", "photo_sizes": 1, "extended": 1, "count": 5, "access_token": token, "v": "5.131"}
 
 res = requests.get(url, params=params).json()
-count = res["response"]["count"]
+count = params["count"]
 nameid = params["owner_id"]
 yx = 0
 listphotos = {}
+savejson = {}
+print(res)
 
 while yx < count:
-    likes = res["response"]["items"][yx]["likes"]["count"]
+    likes = str(res["response"]["items"][yx]["likes"]["count"]) + ".jpg"
     listphotos[likes] = res["response"]["items"][yx]["sizes"][-1]["url"]
+    savejson["name-" + likes] = "size: " + res["response"]["items"][yx]["sizes"][-1]["type"]
     yx += 1
 
-with open('listphotos.json', 'w') as outfile:
-    json.dump(listphotos, outfile)
+with open('savejson.json', 'w') as outfile:
+    json.dump(savejson, outfile)
 
 y = yadisk.YaDisk(token=yatoken)
 y.mkdir("/vkapi/id" + nameid)
@@ -38,7 +42,7 @@ headers = {
 
 for nameurl in tqdm(listphotos):
     params = {
-        'path':"/vkapi/id" + nameid + "/" + str(nameurl) + ".jpg",
+        'path':"/vkapi/id" + nameid + "/" + str(nameurl),
         'url': listphotos[nameurl]
     }
     url1 = "https://cloud-api.yandex.net/v1/disk/resources/upload/"
