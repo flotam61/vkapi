@@ -21,7 +21,6 @@ nameid = params["owner_id"]
 yx = 0
 listphotos = {}
 savejson = {}
-print(res)
 
 while yx < count:
     likes = str(res["response"]["items"][yx]["likes"]["count"]) + ".jpg"
