@@ -1,32 +1,29 @@
 import requests
-import pprint
 import json
 import yadisk
 from tqdm import tqdm
 
 # 76119731
 
-with open("token.txt", "r") as file_object:
-    token = file_object.read().strip()
-
+vktoken = input("Введите токен vkapi ")
 yatoken = input("Введите токен Яндекс диска, куда хотите загрузить фотографии ")
 idvk = input("Введите id страницы в вконтакте ")
 
 url = "https://api.vk.com/method/photos.get"
-params = {"owner_id": idvk, "album_id": "profile", "photo_sizes": 1, "extended": 1, "count": 5, "access_token": token, "v": "5.131"}
+params = {"owner_id": idvk, "album_id": "profile", "photo_sizes": 1, "extended": 1, "count": 5, "access_token": vktoken, "v": "5.131"}
 
 res = requests.get(url, params=params).json()
 count = params["count"]
 nameid = params["owner_id"]
 yx = 0
 listphotos = {}
-savejson = {}
+savejson = []
 print(res)
 
 while yx < count:
     likes = str(res["response"]["items"][yx]["likes"]["count"]) + ".jpg"
     listphotos[likes] = res["response"]["items"][yx]["sizes"][-1]["url"]
-    savejson["name-" + likes] = "size: " + res["response"]["items"][yx]["sizes"][-1]["type"]
+    savejson.append({"file_name": likes, "size": res["response"]["items"][yx]["sizes"][-1]["type"]})
     yx += 1
 
 with open('savejson.json', 'w') as outfile:
