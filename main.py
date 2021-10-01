@@ -1,6 +1,5 @@
 import requests
 import json
-import yadisk
 from tqdm import tqdm
 
 # 76119731
@@ -28,22 +27,25 @@ while yx < count:
 with open('savejson.json', 'w') as outfile:
     json.dump(savejson, outfile)
 
-y = yadisk.YaDisk(token=yatoken)
-y.mkdir("/vkapi/id" + nameid)
-
 headers = {
     "Accept": "application/json",
     "Authorization": "OAuth " + yatoken
 }
+
+url_patch = "https://cloud-api.yandex.net/v1/disk/resources/"
+params_patch = {
+    'path': "/vkapi/id" + nameid
+}
+r = requests.put(url=url_patch, params=params_patch, headers=headers)
 
 for nameurl in tqdm(listphotos):
     params = {
         'path':"/vkapi/id" + nameid + "/" + str(nameurl),
         'url': listphotos[nameurl]
     }
-    url1 = "https://cloud-api.yandex.net/v1/disk/resources/upload/"
-    r = requests.post(url=url1, params=params, headers=headers)
-    res = r.json()
-    print(res)
+    url_upload = "https://cloud-api.yandex.net/v1/disk/resources/upload/"
+    r = requests.post(url=url_upload, params=params, headers=headers)
+    res_upload = r.json()
+    print(res_upload)
 
 
