@@ -55,12 +55,13 @@ def upload_yadisk():
     url_create_folder = "https://cloud-api.yandex.net/v1/disk/resources/"
     if choise == "vk" or choise == "VK":
         params_create_folder = {
-            'path': "/vkapi/id" + idvk
+            'path': "id" + idvk
         }
         res_folder = requests.put(url=url_create_folder, params=params_create_folder, headers=headers)
+        print(res_folder)
         for name_url in tqdm(listphotos):
             params = {
-                'path': "/vkapi/id" + idvk + "/" + str(name_url),
+                'path': "id" + idvk + "/" + str(name_url),
                 'url': listphotos[name_url]
             }
             url_upload = "https://cloud-api.yandex.net/v1/disk/resources/upload/"
