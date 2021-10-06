@@ -6,19 +6,6 @@ from tqdm import tqdm
 # 457239031
 # 125131457
 
-def menu():
-    print("Программа сохраняет фотографии с разных API на яДиск. Выберите API")
-    global choise
-    choise = input("Возможные варианты: vk, instagram, ok. (Пока возможно только вк) ")
-    global yatoken
-    yatoken = input("Введите Token яДиска, куда загрузить фотографии ")
-    if choise == "vk" or choise == "VK":
-        print()
-        vkphoto()
-    else:
-        print("Неверно! Напишите <vk>, остальные функции появятся в сл. версии программы.")
-
-
 def vkphoto():
     print("Функция загружает на яДиск необходимое кол-во фото с аватарок vk данного ID")
     print("И сохраняет список файлов в формате <Имя : размер> в файл <savejson.json>")
@@ -83,3 +70,12 @@ def upload_yadisk():
             r = requests.post(url=url_upload, params=params, headers=headers)
             res_upload = r.json()
 
+if __name__ == '__main__':
+    print("Программа сохраняет фотографии с разных API на яДиск. Выберите API")
+    choise = input("Возможные варианты: vk, instagram, ok. (Пока возможно только вк) ")
+    yatoken = input("Введите Token яДиска, куда загрузить фотографии ")
+    if choise == "vk" or choise == "VK":
+        print()
+        vkphoto()
+    else:
+        print("Неверно! Напишите <vk>, остальные функции появятся в сл. версии программы.")
