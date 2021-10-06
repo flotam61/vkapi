@@ -3,8 +3,7 @@ import json
 from tqdm import tqdm
 
 # 76119731
-# 457239031
-# 125131457
+# 306030189
 
 def vkphoto():
     print("Функция загружает на яДиск необходимое кол-во фото с аватарок vk данного ID")
@@ -29,24 +28,32 @@ def vkphoto():
 
         c = 0
         v = 0
-        for y in resvk["response"]["items"][0]["sizes"]:
-            v += 1
-            if y["height"] > c:
-                c = y["height"]
-
         y = 0
-        for item in resvk["response"]["items"]:
-            if str(resvk["response"]["items"][y]["likes"]["count"]) + ".jpg" in listphotos.keys():
-                likes = str(resvk["response"]["items"][y]["likes"]["count"]) + str(
-                    resvk["response"]["items"][y]["date"]) + ".jpg"
-                listphotos[likes] = resvk["response"]["items"][y]["sizes"][v - 1]["url"]
-                savejson.append({"file_name": likes, "size": resvk["response"]["items"][y]["sizes"][-1]["type"]})
-                y += 1
-            else:
-                likes = str(resvk["response"]["items"][y]["likes"]["count"]) + ".jpg"
-                listphotos[likes] = resvk["response"]["items"][y]["sizes"][v - 1]["url"]
-                savejson.append({"file_name": likes, "size": resvk["response"]["items"][y]["sizes"][-1]["type"]})
-                y += 1
+
+        while y < countphotos:
+            for u in resvk["response"]["items"][y]["sizes"]:
+                if u["height"] >= c:
+                    v += 1
+                    c = u["height"]
+
+            for item in resvk["response"]["items"]:
+                if str(resvk["response"]["items"][y]["likes"]["count"]) + ".jpg" in listphotos.keys():
+                    likes = str(resvk["response"]["items"][y]["likes"]["count"]) + str(
+                        resvk["response"]["items"][y]["date"]) + ".jpg"
+                    listphotos[likes] = resvk["response"]["items"][y]["sizes"][v]["url"]
+                    savejson.append({"file_name": likes, "size": resvk["response"]["items"][y]["sizes"][v]["type"]})
+                    y += 1
+                    c = 0
+                    v = 0
+                    break
+                else:
+                    likes = str(resvk["response"]["items"][y]["likes"]["count"]) + ".jpg"
+                    listphotos[likes] = resvk["response"]["items"][y]["sizes"][v]["url"]
+                    savejson.append({"file_name": likes, "size": resvk["response"]["items"][y]["sizes"][-1]["type"]})
+                    y += 1
+                    c = 0
+                    v = 0
+                    break
 
     with open('savejson.json', 'w') as outfile:
         json.dump(savejson, outfile)
