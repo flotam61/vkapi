@@ -5,12 +5,10 @@ from tqdm import tqdm
 # 76119731
 # 306030189
 
-def vkphoto():
+def vkphoto(idvk):
     print("Функция загружает на яДиск необходимое кол-во фото с аватарок vk данного ID")
     print("И сохраняет список файлов в формате <Имя : размер> в файл <savejson.json>")
     vktoken = input("Введите token VK ")
-    global idvk
-    idvk = input("Введите ID пользователя vk ")
     countphotos = int(input("Сколько фотографий загрузить? "))
 
     url = "https://api.vk.com/method/photos.get"
@@ -22,7 +20,6 @@ def vkphoto():
         print("Столько фото нет, максимум:", resvk["response"]["count"])
         return vkphoto()
     else:
-        global listphotos
         listphotos = {}
         savejson = []
 
@@ -57,9 +54,9 @@ def vkphoto():
 
     with open('savejson.json', 'w') as outfile:
         json.dump(savejson, outfile)
-    upload_yadisk()
+    return listphotos
 
-def upload_yadisk():
+def upload_yadisk(listphotos):
     print()
     print("Загружаем фото на яДиск")
     headers = {
@@ -72,6 +69,10 @@ def upload_yadisk():
             'path': "id" + idvk
         }
         res_folder = requests.put(url=url_create_folder, params=params_create_folder, headers=headers)
+        if res_folder.status_code == 201:
+            print("Все хорошо, фотографии загружаются")
+        else:
+            print("Что-то пошло не так")
         for name_url in tqdm(listphotos):
             params = {
                 'path': "id" + idvk + "/" + str(name_url),
@@ -79,14 +80,16 @@ def upload_yadisk():
             }
             url_upload = "https://cloud-api.yandex.net/v1/disk/resources/upload/"
             r = requests.post(url=url_upload, params=params, headers=headers)
-            res_upload = r.json()
+
 
 if __name__ == '__main__':
     print("Программа сохраняет фотографии с разных API на яДиск. Выберите API")
     choise = input("Возможные варианты: vk, instagram, ok. (Пока возможно только вк) ")
     yatoken = input("Введите Token яДиска, куда загрузить фотографии ")
     if choise == "vk" or choise == "VK":
+        idvk = input("Введите ID пользователя vk ")
         print()
-        vkphoto()
+        listphotos = vkphoto(idvk)
+        upload_yadisk(listphotos)
     else:
         print("Неверно! Напишите <vk>, остальные функции появятся в сл. версии программы.")
