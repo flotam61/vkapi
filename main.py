@@ -27,30 +27,25 @@ def vkphoto(idvk):
         v = 0
         y = 0
 
-        while y < countphotos:
+        for item in resvk["response"]["items"]:
             for u in resvk["response"]["items"][y]["sizes"]:
                 if u["height"] >= c:
                     v += 1
                     c = u["height"]
-
-            for item in resvk["response"]["items"]:
-                if str(resvk["response"]["items"][y]["likes"]["count"]) + ".jpg" in listphotos.keys():
-                    likes = str(resvk["response"]["items"][y]["likes"]["count"]) + str(
-                        resvk["response"]["items"][y]["date"]) + ".jpg"
-                    listphotos[likes] = resvk["response"]["items"][y]["sizes"][v]["url"]
-                    savejson.append({"file_name": likes, "size": resvk["response"]["items"][y]["sizes"][v]["type"]})
-                    y += 1
-                    c = 0
-                    v = 0
-                    break
-                else:
-                    likes = str(resvk["response"]["items"][y]["likes"]["count"]) + ".jpg"
-                    listphotos[likes] = resvk["response"]["items"][y]["sizes"][v]["url"]
-                    savejson.append({"file_name": likes, "size": resvk["response"]["items"][y]["sizes"][-1]["type"]})
-                    y += 1
-                    c = 0
-                    v = 0
-                    break
+            if str(item["likes"]["count"]) + ".jpg" in listphotos.keys():
+                likes = str(item["likes"]["count"]) + str(item["date"]) + ".jpg"
+                listphotos[likes] = item["sizes"][v]
+                savejson.append({"file_name": likes, "size": item["sizes"][v]["type"]})
+                y += 1
+                c = 0
+                v = 0
+            else:
+                likes = str(item["likes"]["count"]) + ".jpg"
+                listphotos[likes] = item["sizes"][v]
+                savejson.append({"file_name": likes, "size": item["sizes"][-1]["type"]})
+                y += 1
+                c = 0
+                v = 0
 
     with open('savejson.json', 'w') as outfile:
         json.dump(savejson, outfile)
