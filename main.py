@@ -5,10 +5,9 @@ from tqdm import tqdm
 # 76119731
 # 306030189
 
-def vkphoto(idvk):
+def vkphoto(idvk, vktoken):
     print("Функция загружает на яДиск необходимое кол-во фото с аватарок vk данного ID")
     print("И сохраняет список файлов в формате <Имя : размер> в файл <savejson.json>")
-    vktoken = input("Введите token VK ")
     countphotos = int(input("Сколько фотографий загрузить? "))
 
     url = "https://api.vk.com/method/photos.get"
@@ -18,7 +17,7 @@ def vkphoto(idvk):
 
     if countphotos > resvk["response"]["count"]:
         print("Столько фото нет, максимум:", resvk["response"]["count"])
-        return vkphoto()
+        return vkphoto(idvk, vktoken)
     else:
         listphotos = {}
         savejson = []
@@ -28,7 +27,7 @@ def vkphoto(idvk):
         y = 0
 
         for item in resvk["response"]["items"]:
-            for u in resvk["response"]["items"][y]["sizes"]:
+            for u in item["sizes"]:
                 if u["height"] >= c:
                     v += 1
                     c = u["height"]
@@ -59,22 +58,21 @@ def upload_yadisk(listphotos):
         "Authorization": "OAuth " + yatoken
     }
     url_create_folder = "https://cloud-api.yandex.net/v1/disk/resources/"
-    if choise == "vk" or choise == "VK":
-        params_create_folder = {
-            'path': "id" + idvk
+    params_create_folder = {
+        'path': "id" + idvk
+    }
+    res_folder = requests.put(url=url_create_folder, params=params_create_folder, headers=headers)
+    if res_folder.status_code == 201:
+        print("Все хорошо, фотографии загружаются")
+    else:
+        print("Что-то пошло не так")
+    for name_url in tqdm(listphotos):
+        params = {
+            'path': "id" + idvk + "/" + str(name_url),
+            'url': listphotos[name_url]
         }
-        res_folder = requests.put(url=url_create_folder, params=params_create_folder, headers=headers)
-        if res_folder.status_code == 201:
-            print("Все хорошо, фотографии загружаются")
-        else:
-            print("Что-то пошло не так")
-        for name_url in tqdm(listphotos):
-            params = {
-                'path': "id" + idvk + "/" + str(name_url),
-                'url': listphotos[name_url]
-            }
-            url_upload = "https://cloud-api.yandex.net/v1/disk/resources/upload/"
-            r = requests.post(url=url_upload, params=params, headers=headers)
+        url_upload = "https://cloud-api.yandex.net/v1/disk/resources/upload/"
+        r = requests.post(url=url_upload, params=params, headers=headers)
 
 
 if __name__ == '__main__':
@@ -83,8 +81,9 @@ if __name__ == '__main__':
     yatoken = input("Введите Token яДиска, куда загрузить фотографии ")
     if choise == "vk" or choise == "VK":
         idvk = input("Введите ID пользователя vk ")
+        vktoken = input("Введите token VK ")
         print()
-        listphotos = vkphoto(idvk)
+        listphotos = vkphoto(idvk, vktoken)
         upload_yadisk(listphotos)
     else:
         print("Неверно! Напишите <vk>, остальные функции появятся в сл. версии программы.")
