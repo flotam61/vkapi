@@ -65,14 +65,18 @@ def upload_yadisk(listphotos):
     if res_folder.status_code == 201:
         print("Все хорошо, фотографии загружаются")
     else:
-        print("Что-то пошло не так")
+        print("Произошла ошибка", res_folder.status_code)
     for name_url in tqdm(listphotos):
         params = {
             'path': "id" + idvk + "/" + str(name_url),
-            'url': listphotos[name_url]
+            'url': listphotos[name_url]['url']
         }
         url_upload = "https://cloud-api.yandex.net/v1/disk/resources/upload/"
         r = requests.post(url=url_upload, params=params, headers=headers)
+        if r.status_code == 202:
+            print("Фото загрузилось успешно")
+        else:
+            print("Произошла ошибка", r.status_code)
 
 
 if __name__ == '__main__':
